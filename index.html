@@ -12,7 +12,7 @@
 
     <header>
         <h1>Video Interaktif Creator</h1>
-        <p>Ubah video biasa menjadi pengalaman yang dapat diklik dan direkam.</p>
+        <p>Ubah video biasa menjadi pengalaman yang dapat diklik, direkam, dan dibagikan.</p>
     </header>
 
     <main>
@@ -32,49 +32,37 @@
                 <div class="video-wrapper">
                     <video id="video-player"></video>
                     <div id="zones-overlay"></div>
+                    <!-- Indikator Perekaman -->
                     <div id="recording-indicator" class="hidden">
                         <span class="rec-dot"></span> Merekam...
                     </div>
                 </div>
                 
-                <!-- Ganti bagian dalam <aside class="controls-panel"> -->
-<aside class="controls-panel">
-    <h3>Kontrol Interaktif</h3>
-    
-    <!-- Bagian Upload ke GitHub Baru -->
-    <button id="upload-to-github-btn" class="btn btn-info">
-        <i class="fab fa-github"></i>
-        Upload Video ke GitHub
-    </button>
+                <aside class="controls-panel">
+                    <h3>Kontrol Interaktif</h3>
+                    
+                    <!-- Bagian Upload ke GitHub -->
+                    <button id="upload-to-github-btn" class="btn btn-info">
+                        <i class="fab fa-github"></i>
+                        Upload Video ke GitHub
+                    </button>
 
-    <!-- Input Token dan Progress Bar -->
-    <div id="github-upload-panel" class="hidden">
-        <div class="control-group">
-            <label for="github-token-input">Token Akses GitHub (PAT):</label>
-            <input type="password" id="github-token-input" placeholder="ghp_...">
-            <small>Token Anda akan disimpan secara aman di browser ini.</small>
-        </div>
-        <div id="upload-progress" class="hidden">
-            <p>Mengunggah... Mohon tunggu.</p>
-            <div class="progress-bar"><div class="progress-fill"></div></div>
-        </div>
-        <div id="upload-result" class="hidden"></div>
-    </div>
-
-    <div class="control-group">
-        <label for="video-url-input">URL Video (Dari GitHub):</label>
-        <input type="text" id="video-url-input" placeholder="URL akan muncul di sini setelah upload">
-    </div>
-
-    <!-- ... (sisa kode di dalam controls-panel tetap sama) ... -->
-    <button id="add-zone-btn" class="btn btn-primary">...</button>
-    <div class="zones-list-container">...</div>
-    <div class="share-section">...</div>
-</aside>
+                    <div id="github-upload-panel" class="hidden">
+                        <div class="control-group">
+                            <label for="github-token-input">Token Akses GitHub (PAT):</label>
+                            <input type="password" id="github-token-input" placeholder="ghp_...">
+                            <small>Token Anda akan disimpan secara aman di browser ini.</small>
+                        </div>
+                        <div id="upload-progress" class="hidden">
+                            <p>Mengunggah... Mohon tunggu (proses memakan waktu ~15 detik).</p>
+                            <div class="progress-bar"><div class="progress-fill"></div></div>
+                        </div>
+                        <div id="upload-result" class="hidden"></div>
+                    </div>
 
                     <div class="control-group">
                         <label for="video-url-input">URL Video (Dari GitHub):</label>
-                        <input type="text" id="video-url-input" placeholder="Tempel URL video dari GitHub di sini">
+                        <input type="text" id="video-url-input" placeholder="URL akan muncul di sini setelah upload">
                     </div>
 
                     <button id="add-zone-btn" class="btn btn-primary">
@@ -93,6 +81,8 @@
                             <i class="fas fa-record-vinyl"></i>
                             Mulai Rekam Video
                         </button>
+                        
+                        <!-- Area Hasil Rekam -->
                         <div id="download-section" class="hidden">
                             <p>Video Anda siap diunduh!</p>
                             <a id="download-link" class="btn btn-success" download="interactive-video.webm">
@@ -100,6 +90,8 @@
                                 Unduh Video
                             </a>
                         </div>
+
+                        <!-- Area Daftar Link untuk Media Sosial -->
                         <div id="links-list-section" class="hidden">
                             <p>Salin daftar link ini ke caption/deskripsi video Anda:</p>
                             <textarea id="links-list-textarea" readonly></textarea>
@@ -107,6 +99,7 @@
                                 <i class="fas fa-copy"></i> Salin Daftar Link
                             </button>
                         </div>
+
                         <button id="generate-link-btn" class="btn btn-secondary">
                             <i class="fas fa-link"></i>
                             Buat Link Shareable (Interaktif)
@@ -135,6 +128,7 @@
         </div>
     </div>
 
+    <!-- Canvas tersembunyi untuk perekaman -->
     <canvas id="recording-canvas" class="hidden"></canvas>
 
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
