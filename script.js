@@ -360,8 +360,8 @@ document.addEventListener('DOMContentLoaded', () => {
         uploadProgress.classList.remove('hidden'); uploadResult.classList.add('hidden');
         
         // !!! PENTING: UBAH BAGIAN INI !!!
-        const githubUsername = 'USERNAME_GITHUB_ANDA';
-        const repoName = 'NAMA_REPO_ANDA';
+        const githubUsername = 'video-interactive';
+        const repoName = 'src';
         const path = `videos/${uploadedFile.name}`;
 
         const reader = new FileReader();
