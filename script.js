@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 videoUrlInput.value = sharedVideoUrl;
                 loadVideoFromUrl(sharedVideoUrl);
             } else {
-                alert('Link shareable berhasil dimuat! Silakan unggah video yang sama untuk melihat zona interaktif.');
+                alert('Link shareable berhasil dimuat! Namun, tidak ada URL video di dalamnya. Silakan unggah video yang sama untuk melihat zona interaktif.');
             }
         } catch (e) {
             console.error("Gagal memuat data dari URL:", e);
@@ -76,20 +76,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (savedToken) {
         githubTokenInput.value = savedToken;
     }
+
     // Logika untuk memutar video otomatis jika parameter 'autoplay' ada
     const autoplayParam = urlParams.get('autoplay');
     if (autoplayParam === 'true') {
-        // Tunggu hingga metadata video dimuat sebelum mencoba memutar
         videoPlayer.addEventListener('loadedmetadata', () => {
-            // Browser modern memerlukan video dalam keadaan 'muted' untuk autoplay
             videoPlayer.muted = true; 
-            videoPlayer.play().catch(error => {
-                console.error("Autoplay dicegah oleh browser:", error);
-                // Anda bisa menambahkan UI di sini untuk meminta user mengklik play jika gagal
-            });
-        }, { once: true }); // Listener akan dihapus setelah dijalankan sekali
+            videoPlayer.play().catch(error => console.error("Autoplay dicegah oleh browser:", error));
+        }, { once: true });
     }
-
 
     // --- EVENT LISTENERS ---
     uploadArea.addEventListener('click', () => videoUpload.click());
@@ -102,21 +97,18 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => copyLinkBtn.textContent = 'Salin', 2000);
     });
     
-    // Event Listener Perekaman
     recordBtn.addEventListener('click', toggleRecording);
     videoPlayer.addEventListener('loadedmetadata', () => {
         recordingCanvas.width = videoPlayer.videoWidth;
         recordingCanvas.height = videoPlayer.videoHeight;
     });
 
-    // Event Listener Daftar Link
     copyLinksBtn.addEventListener('click', () => {
         navigator.clipboard.writeText(linksListTextarea.value);
         copyLinksBtn.innerHTML = '<i class="fas fa-check"></i> Tersalin!';
         setTimeout(() => copyLinksBtn.innerHTML = '<i class="fas fa-copy"></i> Salin Daftar Link', 2000);
     });
 
-    // Event Listener Upload GitHub
     uploadToGithubBtn.addEventListener('click', () => {
         githubUploadPanel.classList.toggle('hidden');
     });
@@ -127,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Modal Event Listeners
     closeBtn.addEventListener('click', closeModal);
     cancelLinkBtn.addEventListener('click', closeModal);
     saveLinkBtn.addEventListener('click', saveZoneLink);
@@ -139,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleVideoUpload(e) {
         const file = e.target.files[0];
         if (file && file.type.startsWith('video/')) {
-            uploadedFile = file; // Simpan file untuk keperluan upload
+            uploadedFile = file;
             const fileURL = URL.createObjectURL(file);
             videoPlayer.src = fileURL;
             showEditor();
@@ -243,43 +234,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNGSI SHARE & REKAM ---
     function generateShareableLink() {
+        // !!! VALIDASI BARU !!!
+        if (!videoUrlInput.value) {
+            alert('Untuk membuat link shareable yang lengkap, Anda harus mengunggah video ke GitHub terlebih dahulu. URL video diperlukan agar orang lain bisa melihatnya.');
+            uploadToGithubBtn.scrollIntoView({ behavior: 'smooth' });
+            return; // Hentikan fungsi
+        }
+
         const dataToEncode = JSON.stringify(zones);
         const encodedData = encodeURIComponent(dataToEncode);
-        const videoUrl = videoUrlInput.value || '';
+        const videoUrl = videoUrlInput.value;
         const baseUrl = window.location.origin + window.location.pathname;
-        const newUrl = `${baseUrl}?data=${encodedData}${videoUrl ? '&video=' + encodeURIComponent(videoUrl) : ''}&autoplay=true`;
+        const newUrl = `${baseUrl}?data=${encodedData}&video=${encodeURIComponent(videoUrl)}&autoplay=true`;
+        
         shareableLink.value = newUrl;
         shareOutput.classList.remove('hidden');
     }
 
-    function toggleRecording() {
-        if (isRecording) stopRecording();
-        else startRecording();
-    }
+    function toggleRecording() { if (isRecording) stopRecording(); else startRecording(); }
 
     function startRecording() {
         if (zones.length === 0) { alert('Tambahkan setidaknya satu zona sebelum merekam.'); return; }
-        
         recordedChunks = [];
         const stream = recordingCanvas.captureStream(30);
         mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-
         mediaRecorder.ondataavailable = (event) => { if (event.data.size > 0) recordedChunks.push(event.data); };
         mediaRecorder.onstop = () => {
             const blob = new Blob(recordedChunks, { type: 'video/webm' });
             const url = URL.createObjectURL(blob);
             downloadLink.href = url;
             downloadSection.classList.remove('hidden');
-            generateLinksList(); // Buat daftar link setelah rekaman selesai
+            generateLinksList();
         };
-
         mediaRecorder.start();
         isRecording = true;
         recordBtn.innerHTML = '<i class="fas fa-stop"></i> Hentikan Rekam';
         recordBtn.classList.remove('btn-danger'); recordBtn.classList.add('btn-secondary');
         recordingIndicator.classList.remove('hidden');
         downloadSection.classList.add('hidden'); linksListSection.classList.add('hidden');
-        
         videoPlayer.currentTime = 0; videoPlayer.play();
         drawCanvas();
     }
@@ -324,171 +316,88 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- FUNGSI UPLOAD GITHUB ---
-   // --- FUNGSI UPLOAD GITHUB (VERSI BARU & LEBIH ANDAL) ---
-async function triggerUpload() {
-    if (!uploadedFile) {
-        alert('Silakan pilih file video terlebih dahulu.');
-        return;
-    }
+    async function triggerUpload() {
+        if (!uploadedFile) { alert('Silakan pilih file video terlebih dahulu.'); return; }
+        const token = githubTokenInput.value || localStorage.getItem('github_pat');
+        if (!token) { alert('Token Akses GitHub diperlukan.'); return; }
+        uploadProgress.classList.remove('hidden'); uploadResult.classList.add('hidden');
+        
+        // !!! PENTING: UBAH BAGIAN INI !!!
+        const githubUsername = 'video-interactive'; // Ganti dengan username Anda
+        const repoName = 'src'; // Ganti dengan nama repository Anda
+        const path = `videos/${uploadedFile.name}`;
 
-    const token = githubTokenInput.value || localStorage.getItem('github_pat');
-    if (!token) {
-        alert('Token Akses GitHub diperlukan.');
-        return;
-    }
-
-    // Tampilkan progress
-    uploadProgress.classList.remove('hidden');
-    uploadResult.classList.add('hidden');
-
-    // !!! PENTING: PASTIKAN BAGIAN INI SUDAH BENAR !!!
-    const githubUsername = 'video-interactive'; // Ganti dengan username Anda
-    const repoName = 'src'; // Ganti dengan nama repository Anda
-    const path = `videos/${uploadedFile.name}`; // Path tempat file akan disimpan
-
-    // Baca file sebagai Base64
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-        const base64content = reader.result.split(',')[1];
-
-        const apiUrl = `https://api.github.com/repos/${githubUsername}/${repoName}/contents/${path}`;
-
-        const body = {
-            message: `Menambahkan video baru: ${uploadedFile.name}`,
-            content: base64content
-        };
-
-        try {
-            const response = await fetch(apiUrl, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(body)
-            });
-
-            const result = await response.json();
-
-            if (response.ok && result.content) {
-                // URL file yang di-upload
-                const videoUrl = result.content.download_url;
-                videoUrlInput.value = videoUrl;
-
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            const base64content = reader.result.split(',')[1];
+            const apiUrl = `https://api.github.com/repos/${githubUsername}/${repoName}/contents/${path}`;
+            const body = { message: `Menambahkan video baru: ${uploadedFile.name}`, content: base64content };
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'PUT', headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json',
+                    }, body: JSON.stringify(body)
+                });
+                const result = await response.json();
+                if (response.ok && result.content) {
+                    const videoUrl = result.content.download_url;
+                    videoUrlInput.value = videoUrl;
+                    uploadProgress.classList.add('hidden');
+                    uploadResult.textContent = `✅ Upload berhasil! Video tersimpan di: ${path}`;
+                    uploadResult.className = 'success'; uploadResult.classList.remove('hidden');
+                } else {
+                    throw new Error(result.message || 'Gagal mengunggah file ke GitHub.');
+                }
+            } catch (error) {
+                console.error(error);
                 uploadProgress.classList.add('hidden');
-                uploadResult.textContent = `✅ Upload berhasil! Video tersimpan di: ${path}`;
-                uploadResult.className = 'success';
-                uploadResult.classList.remove('hidden');
-            } else {
-                // Tampilkan error dari GitHub jika ada
-                throw new Error(result.message || 'Gagal mengunggah file ke GitHub.');
+                uploadResult.textContent = `❌ Error: ${error.message}`;
+                uploadResult.className = 'error'; uploadResult.classList.remove('hidden');
             }
-        } catch (error) {
-            console.error(error);
-            uploadProgress.classList.add('hidden');
-            uploadResult.textContent = `❌ Error: ${error.message}`;
-            uploadResult.className = 'error';
-            uploadResult.classList.remove('hidden');
-        }
-    };
-    reader.readAsDataURL(uploadedFile);
-}
-    // --- INTERACT.JS SETUP ---
- // --- FUNGSI INTERACT.JS YANG BENAR ---
-function setupInteractJS(element) {
-    interact(element)
-        .draggable({
-            listeners: {
-                move(event) {
-                    const target = event.target;
-                    const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-                    const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+        };
+        reader.readAsDataURL(uploadedFile);
+    }
 
-                    // Konversi pixel ke persentase
-                    const parentRect = target.parentElement.getBoundingClientRect();
-                    const xPercent = (x / parentRect.width) * 100;
-                    const yPercent = (y / parentRect.height) * 100;
-
-                    target.style.left = `${xPercent}%`;
-                    target.style.top = `${yPercent}%`;
-                    
-                    target.setAttribute('data-x', x);
-                    target.setAttribute('data-y', y);
-
-                    // Update state
-                    const zoneId = parseInt(target.id.split('-')[1]);
-                    const zone = zones.find(z => z.id === zoneId);
-                    if (zone) {
-                        zone.x = xPercent;
-                        zone.y = yPercent;
+    // --- FUNGSI INTERACT.JS YANG BENAR ---
+    function setupInteractJS(element) {
+        interact(element)
+            .draggable({
+                listeners: {
+                    move(event) {
+                        const target = event.target;
+                        const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                        const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+                        const parentRect = target.parentElement.getBoundingClientRect();
+                        const xPercent = (x / parentRect.width) * 100;
+                        const yPercent = (y / parentRect.height) * 100;
+                        target.style.left = `${xPercent}%`;
+                        target.style.top = `${yPercent}%`;
+                        target.setAttribute('data-x', x);
+                        target.setAttribute('data-y', y);
+                        const zoneId = parseInt(target.id.split('-')[1]);
+                        const zone = zones.find(z => z.id === zoneId);
+                        if (zone) { zone.x = xPercent; zone.y = yPercent; }
                     }
-                }
-            },
-            modifiers: [
-                interact.modifiers.restrictRect({
-                    restriction: 'parent',
-                    endOnly: true
-                })
-            ]
-        })
-        .resizable({
-            edges: { left: true, right: true, bottom: true, top: true },
-            listeners: {
-                move(event) {
-                    const target = event.target;
-                    let x = (parseFloat(target.getAttribute('data-x')) || 0);
-                    let y = (parseFloat(target.getAttribute('data-y')) || 0);
-
-                    target.style.width = `${event.rect.width}px`;
-                    target.style.height = `${event.rect.height}px`;
-
-                    x += event.deltaRect.left;
-                    y += event.deltaRect.top;
-
-                    target.style.left = `${x}px`;
-                    target.style.top = `${y}px`;
-
-                    // Konversi ke persentase
-                    const parentRect = target.parentElement.getBoundingClientRect();
-                    const xPercent = (x / parentRect.width) * 100;
-                    const yPercent = (y / parentRect.height) * 100;
-                    const widthPercent = (event.rect.width / parentRect.width) * 100;
-                    const heightPercent = (event.rect.height / parentRect.height) * 100;
-
-                    target.style.left = `${xPercent}%`;
-                    target.style.top = `${yPercent}%`;
-                    target.style.width = `${widthPercent}%`;
-                    target.style.height = `${heightPercent}%`;
-
-                    target.setAttribute('data-x', x);
-                    target.setAttribute('data-y', y);
-
-                    // Update state
-                    const zoneId = parseInt(target.id.split('-')[1]);
-                    const zone = zones.find(z => z.id === zoneId);
-                    if (zone) {
-                        zone.x = xPercent;
-                        zone.y = yPercent;
-                        zone.width = widthPercent;
-                        zone.height = heightPercent;
-                    }
-                }
-            },
-            modifiers: [
-                interact.modifiers.restrictEdges({
-                    outer: 'parent'
-                }),
-                interact.modifiers.restrictSize({
-                    min: { width: 50, height: 50 }
-                })
-            ],
-            inertia: true
-        });
-}
-
-// Fungsi helper untuk interact.js
-interact.maxInteractions(Infinity);
-    // Fungsi helper untuk interact.js (dipisah untuk kemudahan)
-    interact.maxInteractions(Infinity);
-});
+                },
+                modifiers: [ interact.modifiers.restrictRect({ restriction: 'parent', endOnly: true }) ]
+            })
+            .resizable({
+                edges: { left: true, right: true, bottom: true, top: true },
+                listeners: {
+                    move(event) {
+                        const target = event.target;
+                        let x = (parseFloat(target.getAttribute('data-x')) || 0);
+                        let y = (parseFloat(target.getAttribute('data-y')) || 0);
+                        target.style.width = `${event.rect.width}px`;
+                        target.style.height = `${event.rect.height}px`;
+                        x += event.deltaRect.left; y += event.deltaRect.top;
+                        target.style.left = `${x}px`; target.style.top = `${y}px`;
+                        const parentRect = target.parentElement.getBoundingClientRect();
+                        const xPercent = (x / parentRect.width) * 100;
+                        const yPercent = (y / parentRect.height) * 100;
+                        const widthPercent = (event.rect.width / parentRect.width) * 100;
+                        const heightPercent = (event.rect.height / parentRect.height) * 100;
+                        target.style.left = `${xPercent}%`; target.style.top = `${yPercent}%`;
+                        target.style.width = `${width
