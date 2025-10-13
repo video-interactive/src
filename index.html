@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Interaktif Creator</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <h1>Video Interaktif Creator</h1>
+        <p>Ubah video biasa menjadi pengalaman yang dapat diklik.</p>
+    </header>
+
+    <main>
+        <!-- Section untuk Upload Video -->
+        <section id="upload-section">
+            <div class="upload-area" id="upload-area">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <h2>Unggah Video Anda</h2>
+                <p>Klik atau seret file video ke area ini</p>
+                <input type="file" id="video-upload" accept="video/*" hidden>
+            </div>
+        </section>
+
+        <!-- Section untuk Editor Video -->
+        <section id="editor-section" class="hidden">
+            <div class="editor-container">
+                <div class="video-wrapper">
+                    <video id="video-player" controls></video>
+                    <div id="zones-overlay"></div>
+                </div>
+                
+                <aside class="controls-panel">
+                    <h3>Kontrol Interaktif</h3>
+                    
+                    <div class="control-group">
+                        <label for="video-url-input">URL Video (Opsional, untuk sharing):</label>
+                        <input type="text" id="video-url-input" placeholder="Masukkan URL video jika ada">
+                    </div>
+
+                    <button id="add-zone-btn" class="btn btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Tambah Zona Klik
+                    </button>
+
+                    <div class="zones-list-container">
+                        <h4>Daftar Zona:</h4>
+                        <ul id="zones-list"></ul>
+                    </div>
+
+                    <div class="share-section">
+                        <button id="generate-link-btn" class="btn btn-success">Buat Link Shareable</button>
+                        <div id="share-output" class="hidden">
+                            <p>Bagikan link ini:</p>
+                            <input type="text" id="shareable-link" readonly>
+                            <button id="copy-link-btn" class="btn btn-secondary">Salin</button>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal untuk Edit Link Zona -->
+    <div id="link-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3>Edit Link Zona</h3>
+            <input type="url" id="zone-link-input" placeholder="https://contoh.com">
+            <div class="modal-actions">
+                <button id="save-link-btn" class="btn btn-primary">Simpan</button>
+                <button id="cancel-link-btn" class="btn btn-secondary">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
