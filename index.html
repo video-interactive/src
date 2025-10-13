@@ -75,30 +75,47 @@
                         <ul id="zones-list"></ul>
                     </div>
 
-                    <div class="share-section">
-                        <h4>Bagikan & Rekam:</h4>
-                        <button id="record-btn" class="btn btn-danger">
-                            <i class="fas fa-record-vinyl"></i>
-                            Mulai Rekam Video
-                        </button>
-                        
-                        <!-- Area Hasil Rekam -->
-                        <div id="download-section" class="hidden">
-                            <p>Video Anda siap diunduh!</p>
-                            <a id="download-link" class="btn btn-success" download="interactive-video.webm">
-                                <i class="fas fa-download"></i>
-                                Unduh Video
-                            </a>
-                        </div>
+                   <!-- Ganti bagian ini di index.html -->
+<div class="share-section">
+    <h4>Bagikan Video Interaktif Anda</h4>
+    
+    <!-- Opsi 1: Link Interaktif (Paling Direkomendasikan) -->
+    <button id="generate-link-btn" class="btn btn-primary">
+        <i class="fas fa-link"></i>
+        Buat Link Interaktif (Shareable)
+    </button>
+    <div id="share-output" class="hidden">
+        <p>Bagikan link ini agar orang lain bisa langsung melihat video dan mengklik zona:</p>
+        <input type="text" id="shareable-link" readonly>
+        <button id="copy-link-btn" class="btn btn-secondary">Salin Link</button>
+    </div>
 
-                        <!-- Area Daftar Link untuk Media Sosial -->
-                        <div id="links-list-section" class="hidden">
-                            <p>Salin daftar link ini ke caption/deskripsi video Anda:</p>
-                            <textarea id="links-list-textarea" readonly></textarea>
-                            <button id="copy-links-btn" class="btn btn-secondary">
-                                <i class="fas fa-copy"></i> Salin Daftar Link
-                            </button>
-                        </div>
+    <!-- Opsi 2: Rekam Video (Untuk Preview/Sosial Media) -->
+    <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid var(--border-color);">
+    <p style="text-align: center; color: var(--secondary-color); margin-bottom: 1rem;">
+        <i>atau rekam video untuk preview (zona tidak akan bisa diklik)</i>
+    </p>
+    <button id="record-btn" class="btn btn-danger">
+        <i class="fas fa-record-vinyl"></i>
+        Rekam Video (Non-Interaktif)
+    </button>
+    
+    <div id="download-section" class="hidden">
+        <p>Video Anda siap diunduh!</p>
+        <a id="download-link" class="btn btn-success" download="interactive-video.webm">
+            <i class="fas fa-download"></i>
+            Unduh Video
+        </a>
+    </div>
+
+    <div id="links-list-section" class="hidden">
+        <p>Salin daftar link ini ke caption/deskripsi video Anda:</p>
+        <textarea id="links-list-textarea" readonly></textarea>
+        <button id="copy-links-btn" class="btn btn-secondary">
+            <i class="fas fa-copy"></i> Salin Daftar Link
+        </button>
+    </div>
+</div>
 
                         <button id="generate-link-btn" class="btn btn-secondary">
                             <i class="fas fa-link"></i>
