@@ -147,3 +147,35 @@ main { flex-grow: 1; padding: 2rem; display: flex; justify-content: center; alig
 .clickable-zone:hover .edit-icon {
     opacity: 1;
 }
+/* ... (Semua CSS sebelumnya tetap sama) ... */
+
+/* Gaya Baru untuk Tombol dan Instruksi GitHub */
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+}
+.btn-info:hover {
+    background-color: #138496;
+}
+
+.instruction-box {
+    background-color: #e2f3f5;
+    border: 1px solid #bee5eb;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+.instruction-box h4 {
+    margin-top: 0;
+    color: #0c5460;
+}
+.instruction-box p {
+    margin-bottom: 0.5rem;
+    color: #0c5460;
+}
+.instruction-box strong {
+    background-color: #d1ecf1;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
