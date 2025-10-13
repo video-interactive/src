@@ -179,3 +179,57 @@ main { flex-grow: 1; padding: 2rem; display: flex; justify-content: center; alig
     padding: 2px 5px;
     border-radius: 3px;
 }
+/* ... (semua CSS sebelumnya tetap sama) ... */
+
+/* Gaya Baru untuk Panel Upload GitHub */
+#github-upload-panel {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+#github-upload-panel small {
+    display: block;
+    margin-top: 0.25rem;
+    color: #6c757d;
+}
+#upload-progress p {
+    margin: 0 0 0.5rem;
+    font-weight: 600;
+}
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background-color: var(--success-color);
+    transition: width 0.3s ease;
+    animation: progress-animation 2s infinite;
+}
+@keyframes progress-animation {
+    0% { width: 0%; }
+    50% { width: 70%; }
+    100% { width: 100%; }
+}
+#upload-result {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: 5px;
+    font-weight: 600;
+}
+#upload-result.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+#upload-result.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
