@@ -428,3 +428,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     interact.maxInteractions(Infinity);
 });
+/* ... (semua CSS sebelumnya tetap sama) ... */
+
+/* Gaya Baru untuk Slider Transparansi */
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+#zone-opacity-input {
+    flex-grow: 1; /* Membuat slider mengambil ruang yang tersisa */
+}
+
+#zone-opacity-value {
+    min-width: 40px; /* Memberikan lebar tetap untuk persentase */
+    text-align: right;
+    font-weight: 600;
+}
