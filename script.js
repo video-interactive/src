@@ -381,20 +381,100 @@ async function triggerUpload() {
     reader.readAsDataURL(uploadedFile);
 }
     // --- INTERACT.JS SETUP ---
-    function setupInteractJS(element) {
-        interact(element)
-            .draggable({
-                listeners: { move(event) { /* ... logika drag ... */ } },
-                modifiers: [ interact.modifiers.restrictRect({ restriction: 'parent', endOnly: true }) ]
-            })
-            .resizable({
-                edges: { left: true, right: true, bottom: true, top: true },
-                listeners: { move(event) { /* ... logika resize ... */ } },
-                modifiers: [ interact.modifiers.restrictEdges({ outer: 'parent' }), interact.modifiers.restrictSize({ min: { width: 50, height: 50 } }) ],
-                inertia: true
-            });
-    }
-    
+ // --- FUNGSI INTERACT.JS YANG BENAR ---
+function setupInteractJS(element) {
+    interact(element)
+        .draggable({
+            listeners: {
+                move(event) {
+                    const target = event.target;
+                    const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                    const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+                    // Konversi pixel ke persentase
+                    const parentRect = target.parentElement.getBoundingClientRect();
+                    const xPercent = (x / parentRect.width) * 100;
+                    const yPercent = (y / parentRect.height) * 100;
+
+                    target.style.left = `${xPercent}%`;
+                    target.style.top = `${yPercent}%`;
+                    
+                    target.setAttribute('data-x', x);
+                    target.setAttribute('data-y', y);
+
+                    // Update state
+                    const zoneId = parseInt(target.id.split('-')[1]);
+                    const zone = zones.find(z => z.id === zoneId);
+                    if (zone) {
+                        zone.x = xPercent;
+                        zone.y = yPercent;
+                    }
+                }
+            },
+            modifiers: [
+                interact.modifiers.restrictRect({
+                    restriction: 'parent',
+                    endOnly: true
+                })
+            ]
+        })
+        .resizable({
+            edges: { left: true, right: true, bottom: true, top: true },
+            listeners: {
+                move(event) {
+                    const target = event.target;
+                    let x = (parseFloat(target.getAttribute('data-x')) || 0);
+                    let y = (parseFloat(target.getAttribute('data-y')) || 0);
+
+                    target.style.width = `${event.rect.width}px`;
+                    target.style.height = `${event.rect.height}px`;
+
+                    x += event.deltaRect.left;
+                    y += event.deltaRect.top;
+
+                    target.style.left = `${x}px`;
+                    target.style.top = `${y}px`;
+
+                    // Konversi ke persentase
+                    const parentRect = target.parentElement.getBoundingClientRect();
+                    const xPercent = (x / parentRect.width) * 100;
+                    const yPercent = (y / parentRect.height) * 100;
+                    const widthPercent = (event.rect.width / parentRect.width) * 100;
+                    const heightPercent = (event.rect.height / parentRect.height) * 100;
+
+                    target.style.left = `${xPercent}%`;
+                    target.style.top = `${yPercent}%`;
+                    target.style.width = `${widthPercent}%`;
+                    target.style.height = `${heightPercent}%`;
+
+                    target.setAttribute('data-x', x);
+                    target.setAttribute('data-y', y);
+
+                    // Update state
+                    const zoneId = parseInt(target.id.split('-')[1]);
+                    const zone = zones.find(z => z.id === zoneId);
+                    if (zone) {
+                        zone.x = xPercent;
+                        zone.y = yPercent;
+                        zone.width = widthPercent;
+                        zone.height = heightPercent;
+                    }
+                }
+            },
+            modifiers: [
+                interact.modifiers.restrictEdges({
+                    outer: 'parent'
+                }),
+                interact.modifiers.restrictSize({
+                    min: { width: 50, height: 50 }
+                })
+            ],
+            inertia: true
+        });
+}
+
+// Fungsi helper untuk interact.js
+interact.maxInteractions(Infinity);
     // Fungsi helper untuk interact.js (dipisah untuk kemudahan)
     interact.maxInteractions(Infinity);
 });
