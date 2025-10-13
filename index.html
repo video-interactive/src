@@ -6,19 +6,20 @@
     <title>Video Interaktif Creator</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
     <header>
         <h1>Video Interaktif Creator</h1>
-        <p>Ubah video biasa menjadi pengalaman yang dapat diklik.</p>
+        <p>Ubah video biasa menjadi pengalaman yang dapat diklik dan direkam.</p>
     </header>
 
     <main>
         <!-- Section untuk Upload Video -->
         <section id="upload-section">
             <div class="upload-area" id="upload-area">
-                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <i class="fas fa-cloud-upload-alt"></i>
                 <h2>Unggah Video Anda</h2>
                 <p>Klik atau seret file video ke area ini</p>
                 <input type="file" id="video-upload" accept="video/*" hidden>
@@ -29,8 +30,12 @@
         <section id="editor-section" class="hidden">
             <div class="editor-container">
                 <div class="video-wrapper">
-                    <video id="video-player" controls></video>
+                    <video id="video-player"></video>
                     <div id="zones-overlay"></div>
+                    <!-- Indikator Perekaman -->
+                    <div id="recording-indicator" class="hidden">
+                        <span class="rec-dot"></span> Merekam...
+                    </div>
                 </div>
                 
                 <aside class="controls-panel">
@@ -42,7 +47,7 @@
                     </div>
 
                     <button id="add-zone-btn" class="btn btn-primary">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <i class="fas fa-plus-square"></i>
                         Tambah Zona Klik
                     </button>
 
@@ -52,7 +57,22 @@
                     </div>
 
                     <div class="share-section">
-                        <button id="generate-link-btn" class="btn btn-success">Buat Link Shareable</button>
+                        <h4>Bagikan & Rekam:</h4>
+                        <button id="record-btn" class="btn btn-danger">
+                            <i class="fas fa-record-vinyl"></i>
+                            Mulai Rekam Video
+                        </button>
+                        <div id="download-section" class="hidden">
+                            <p>Video Anda siap diunduh!</p>
+                            <a id="download-link" class="btn btn-success" download="interactive-video.webm">
+                                <i class="fas fa-download"></i>
+                                Unduh Video
+                            </a>
+                        </div>
+                        <button id="generate-link-btn" class="btn btn-secondary">
+                            <i class="fas fa-link"></i>
+                            Buat Link Shareable
+                        </button>
                         <div id="share-output" class="hidden">
                             <p>Bagikan link ini:</p>
                             <input type="text" id="shareable-link" readonly>
@@ -76,6 +96,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Canvas tersembunyi untuk perekaman -->
+    <canvas id="recording-canvas" class="hidden"></canvas>
 
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
     <script src="script.js"></script>
