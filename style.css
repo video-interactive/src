@@ -20,44 +20,181 @@ body {
     min-height: 100vh;
 }
 
-/* ... (Header, Main, Upload Section, Editor Section, Controls Panel tetap sama) ... */
 header {
     background-color: var(--card-background);
     padding: 1.5rem;
     text-align: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
-header h1 { margin: 0; color: var(--primary-color); }
-header p { margin: 0.5rem 0 0; color: var(--secondary-color); }
-main { flex-grow: 1; padding: 2rem; display: flex; justify-content: center; align-items: center; }
-#upload-section { width: 100%; max-width: 500px; }
-.upload-area { border: 3px dashed var(--primary-color); border-radius: 10px; padding: 3rem; text-align: center; cursor: pointer; transition: background-color 0.3s, border-color 0.3s; background-color: var(--card-background); }
-.upload-area:hover, .upload-area.dragover { background-color: #e9f5ff; border-color: #0056b3; }
-.upload-area i.fa-cloud-upload-alt { color: var(--primary-color); font-size: 3rem; margin-bottom: 1rem; }
-#editor-section { width: 100%; max-width: 1400px; }
-.editor-container { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; background-color: var(--card-background); padding: 2rem; border-radius: 10px; box-shadow: var(--shadow); }
-.video-wrapper { position: relative; background-color: #000; border-radius: 8px; overflow: hidden; }
-#video-player { width: 100%; height: auto; display: block; }
-#zones-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-.controls-panel { display: flex; flex-direction: column; gap: 1.5rem; }
-.control-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
-.control-group input { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 5px; box-sizing: border-box; }
-.zones-list-container { max-height: 300px; overflow-y: auto; border: 1px solid var(--border-color); padding: 1rem; border-radius: 5px; }
-#zones-list { list-style: none; padding: 0; margin: 0; }
-#zones-list li { background-color: var(--background-color); padding: 0.75rem; border-radius: 5px; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; word-break: break-all; }
 
-/* ... (Buttons tetap sama) ... */
-.btn { padding: 0.75rem 1.5rem; border: none; border-radius: 5px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s, transform 0.1s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
-.btn:hover { transform: translateY(-2px); }
-.btn:active { transform: translateY(0); }
+header h1 {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 1.8rem;
+}
+
+header p {
+    margin: 0.5rem 0 0;
+    color: var(--secondary-color);
+    font-size: 1rem;
+}
+
+main {
+    flex-grow: 1;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Upload Section */
+#upload-section {
+    width: 100%;
+    max-width: 500px;
+}
+
+.upload-area {
+    border: 3px dashed var(--primary-color);
+    border-radius: 10px;
+    padding: 3rem;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+    background-color: var(--card-background);
+}
+
+.upload-area:hover, .upload-area.dragover {
+    background-color: #e9f5ff;
+    border-color: #0056b3;
+}
+
+.upload-area i.fa-cloud-upload-alt {
+    color: var(--primary-color);
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+/* Editor Section */
+#editor-section {
+    width: 100%;
+    max-width: 1400px;
+}
+
+.editor-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    background-color: var(--card-background);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+}
+
+.video-wrapper {
+    position: relative;
+    background-color: #000;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#video-player {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+#zones-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Controls Panel */
+.controls-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.control-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.zones-list-container {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    border-radius: 5px;
+}
+
+#zones-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#zones-list li {
+    background-color: var(--background-color);
+    padding: 0.75rem;
+    border-radius: 5px;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    word-break: break-all;
+}
+
+/* Buttons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none; /* Untuk tag <a> */
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
 .btn-primary { background-color: var(--primary-color); color: white; }
 .btn-primary:hover { background-color: #0056b3; }
+
 .btn-success { background-color: var(--success-color); color: white; }
 .btn-success:hover { background-color: #218838; }
-.btn-danger { background-color: var(--danger-color); color: white; }
+
+.btn-danger { background-color: var(--danger-color); color: white; padding: 0.5rem 1rem; font-size: 0.9rem;}
 .btn-danger:hover { background-color: #c82333; }
+
 .btn-secondary { background-color: var(--secondary-color); color: white; }
 .btn-secondary:hover { background-color: #5a6268; }
+
+.btn-info { background-color: #17a2b8; color: white; }
+.btn-info:hover { background-color: #138496; }
 
 /* Gaya Baru untuk Perekaman */
 #recording-indicator {
@@ -101,116 +238,31 @@ main { flex-grow: 1; padding: 2rem; display: flex; justify-content: center; alig
     color: #155724;
 }
 
-/* ... (Share Output, Modal, Utility Classes tetap sama) ... */
-#share-output { margin-top: 1rem; padding: 1rem; background-color: #e9ecef; border-radius: 5px; }
-#share-output p { margin: 0 0 0.5rem; font-weight: 600; }
-#shareable-link { width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; border: 1px solid var(--border-color); border-radius: 5px; background-color: white; }
-.modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; }
-.modal-content { background-color: var(--card-background); padding: 2rem; border-radius: 10px; width: 90%; max-width: 500px; position: relative; box-shadow: var(--shadow); }
-.close-btn { position: absolute; right: 1.5rem; top: 1.5rem; font-size: 2rem; font-weight: bold; cursor: pointer; color: var(--secondary-color); }
-.modal-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; }
-.hidden { display: none !important; }
-
-/* Gaya Baru untuk Zona */
-.clickable-zone {
-    position: absolute;
-    /* Hapus background dan border default */
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    /* Tambahkan transisi untuk efek hover yang halus */
-    transition: transform 0.2s ease-in-out;
-}
-
-/* Gaya untuk Ikon Play di dalam Zona */
-.clickable-zone .play-icon {
-    color: white;
-    font-size: 3rem; /* Ukuran ikon yang besar */
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); /* Bayangan agar ikon terlihat jelas di video apa pun */
-    opacity: 0.9;
-    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
-}
-
-.clickable-zone:hover {
-    background-color: rgba(0, 123, 255, 0.6);
-}
-/* Ikon Edit di dalam Zona */
-.clickable-zone .edit-icon {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: rgba(0,0,0,0.5);
-    color: white;
-    padding: 2px 5px;
-    border-radius: 3px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.2s;
-}
-/* Efek Hover saat kursor di atas zona */
-.clickable-zone:hover {
-    transform: scale(1.05); /* Zona sedikit membesar */
-}
-.clickable-zone:hover .play-icon {
-    opacity: 1;
-    transform: scale(1.1); /* Ikon play lebih besar lagi saat hover */
-}
-
-/* Gaya untuk Ikon Edit (tidak berubah) */
-.clickable-zone .edit-icon {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: rgba(0,0,0,0.5);
-    color: white;
-    padding: 2px 5px;
-    border-radius: 3px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.2s;
-}
-.clickable-zone:hover .edit-icon {
-    opacity: 1;
-}
-/* ... (Semua CSS sebelumnya tetap sama) ... */
-
-/* Gaya Baru untuk Tombol dan Instruksi GitHub */
-.btn-info {
-    background-color: #17a2b8;
-    color: white;
-}
-.btn-info:hover {
-    background-color: #138496;
-}
-
-.instruction-box {
-    background-color: #e2f3f5;
-    border: 1px solid #bee5eb;
-    border-radius: 5px;
-    padding: 1rem;
+/* Gaya Baru untuk Daftar Link */
+#links-list-section {
     margin-top: 1rem;
-    font-size: 0.9rem;
+    padding: 1rem;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: 5px;
 }
-.instruction-box h4 {
-    margin-top: 0;
-    color: #0c5460;
+#links-list-section p {
+    margin: 0 0 1rem;
+    font-weight: 600;
+    color: #856404;
 }
-.instruction-box p {
+#links-list-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 0.5rem;
     margin-bottom: 0.5rem;
-    color: #0c5460;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: white;
+    font-family: monospace;
+    font-size: 0.9rem;
+    resize: vertical;
 }
-.instruction-box strong {
-    background-color: #d1ecf1;
-    padding: 2px 5px;
-    border-radius: 3px;
-}
-/* ... (semua CSS sebelumnya tetap sama) ... */
 
 /* Gaya Baru untuk Panel Upload GitHub */
 #github-upload-panel {
@@ -264,20 +316,125 @@ main { flex-grow: 1; padding: 2rem; display: flex; justify-content: center; alig
     color: #721c24;
     border: 1px solid #f5c6cb;
 }
+
+/* ... (Share Output, Modal, Utility Classes tetap sama) ... */
+#share-output { margin-top: 1rem; padding: 1rem; background-color: #e9ecef; border-radius: 5px; }
+#share-output p { margin: 0 0 0.5rem; font-weight: 600; }
+#shareable-link { width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; border: 1px solid var(--border-color); border-radius: 5px; background-color: white; }
+.modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; }
+.modal-content { background-color: var(--card-background); padding: 2rem; border-radius: 10px; width: 90%; max-width: 500px; position: relative; box-shadow: var(--shadow); }
+.close-btn { position: absolute; right: 1.5rem; top: 1.5rem; font-size: 2rem; font-weight: bold; cursor: pointer; color: var(--secondary-color); }
+.modal-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; }
+.hidden { display: none !important; }
+
+/* Gaya Baru untuk Zona */
+.clickable-zone {
+    position: absolute;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    transition: transform 0.2s ease-in-out;
+}
+.clickable-zone .play-icon {
+    color: white;
+    font-size: 3rem;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    opacity: 0.9;
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+.clickable-zone:hover {
+    transform: scale(1.05);
+}
+.clickable-zone:hover .play-icon {
+    opacity: 1;
+    transform: scale(1.1);
+}
+.clickable-zone .edit-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.clickable-zone:hover .edit-icon {
+    opacity: 1;
+}
+
 /* Gaya Baru untuk Slider Transparansi */
 .slider-container {
     display: flex;
     align-items: center;
     gap: 1rem;
 }
-
 #zone-opacity-input {
-    flex-grow: 1; /* Membuat slider mengambil ruang yang tersisa */
+    flex-grow: 1;
 }
-
 #zone-opacity-value {
-    min-width: 40px; /* Memberikan lebar tetap untuk persentase */
+    min-width: 40px;
     text-align: right;
     font-weight: 600;
 }
 
+/* =============================================================== */
+/* ==================== MEDIA QUERY UNTUK MOBILE ================== */
+/* =============================================================== */
+
+@media (max-width: 768px) {
+    main {
+        padding: 1rem;
+    }
+
+    header {
+        padding: 1rem 1.5rem;
+    }
+    header h1 {
+        font-size: 1.5rem;
+    }
+    header p {
+        font-size: 0.9rem;
+    }
+
+    .editor-container {
+        grid-template-columns: 1fr; /* Ubah menjadi 1 kolom */
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .video-wrapper {
+        border-radius: 0; /* Hapus border-radius untuk memaksimalkan layar */
+    }
+
+    .controls-panel {
+        gap: 1rem;
+    }
+
+    .btn {
+        width: 100%; /* Buat semua tombol menjadi lebar penuh */
+        justify-content: center;
+    }
+
+    #zones-list li {
+        flex-direction: column; /* Susun teks dan tombol secara vertikal */
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    #zones-list li div {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end; /* Ratakan tombol ke kanan */
+    }
+
+    .modal-content {
+        padding: 1.5rem; /* Kurangi padding modal */
+    }
+}
