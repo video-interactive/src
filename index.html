@@ -32,7 +32,6 @@
                 <div class="video-wrapper">
                     <video id="video-player"></video>
                     <div id="zones-overlay"></div>
-                    <!-- Indikator Perekaman -->
                     <div id="recording-indicator" class="hidden">
                         <span class="rec-dot"></span> Merekam...
                     </div>
@@ -41,9 +40,28 @@
                 <aside class="controls-panel">
                     <h3>Kontrol Interaktif</h3>
                     
+                    <!-- Tombol Upload ke GitHub Baru -->
+                    <button id="upload-to-github-btn" class="btn btn-info">
+                        <i class="fab fa-github"></i>
+                        Upload Video ke GitHub
+                    </button>
+
+                    <!-- Instruksi Upload Baru -->
+                    <div id="github-instructions" class="instruction-box hidden">
+                        <h4><i class="fas fa-info-circle"></i> Instruksi Upload ke GitHub</h4>
+                        <p>1. Klik tombol di bawah ini. Anda akan diarahkan ke halaman upload GitHub.</p>
+                        <p>2. Seret file video Anda (yang sama dengan yang Anda unggah di sini) ke kotak yang disediakan.</p>
+                        <p>3. Klik <strong>"Commit changes"</strong>.</p>
+                        <p>4. Setelah selesai, buka file video tersebut dan klik <strong>"Raw"</strong> untuk mendapatkan URL-nya.</p>
+                        <p>5. Salin URL dan tempel di input "URL Video" di bawah.</p>
+                        <a id="github-upload-link" target="_blank" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt"></i> Buka Halaman Upload GitHub
+                        </a>
+                    </div>
+
                     <div class="control-group">
-                        <label for="video-url-input">URL Video (Opsional, untuk sharing):</label>
-                        <input type="text" id="video-url-input" placeholder="Masukkan URL video jika ada">
+                        <label for="video-url-input">URL Video (Dari GitHub):</label>
+                        <input type="text" id="video-url-input" placeholder="Tempel URL video dari GitHub di sini">
                     </div>
 
                     <button id="add-zone-btn" class="btn btn-primary">
@@ -69,9 +87,16 @@
                                 Unduh Video
                             </a>
                         </div>
+                        <div id="links-list-section" class="hidden">
+                            <p>Salin daftar link ini ke caption/deskripsi video Anda:</p>
+                            <textarea id="links-list-textarea" readonly></textarea>
+                            <button id="copy-links-btn" class="btn btn-secondary">
+                                <i class="fas fa-copy"></i> Salin Daftar Link
+                            </button>
+                        </div>
                         <button id="generate-link-btn" class="btn btn-secondary">
                             <i class="fas fa-link"></i>
-                            Buat Link Shareable
+                            Buat Link Shareable (Interaktif)
                         </button>
                         <div id="share-output" class="hidden">
                             <p>Bagikan link ini:</p>
@@ -97,7 +122,6 @@
         </div>
     </div>
 
-    <!-- Canvas tersembunyi untuk perekaman -->
     <canvas id="recording-canvas" class="hidden"></canvas>
 
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
