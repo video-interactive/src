@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- DETEKSI HALAMAN ---
-    // Cek apakah kita berada di halaman player atau editor
     const isPlayerPage = window.location.pathname.endsWith('player.html');
 
     // --- ELEMEN DOM ---
@@ -68,7 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
             zones = JSON.parse(decodeURIComponent(sharedData));
             zoneIdCounter = Math.max(...zones.map(z => z.id), 0) + 1;
             if (sharedVideoUrl) {
-                // Jika di halaman player, langsung load video. Jika di editor, isi input.
                 if (isPlayerPage) {
                     loadVideoFromUrl(sharedVideoUrl);
                 } else {
@@ -76,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     loadVideoFromUrl(sharedVideoUrl);
                 }
             } else {
-                // Pesan error hanya relevan untuk halaman editor
                 if (!isPlayerPage) {
                     alert('Link shareable berhasil dimuat! Namun, tidak ada URL video di dalamnya. Silakan unggah video yang sama untuk melihat zona interaktif.');
                 }
@@ -85,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Gagal memuat data dari URL:", e);
         }
     } else {
-        // Jika tidak ada data dan ini adalah halaman player, tampilkan pesan error
         if (isPlayerPage) {
             document.body.innerHTML = '<div style="color:white; text-align:center; padding:2rem; font-family: sans-serif;"><h1>Error</h1><p>Link tidak valid atau tidak ada data video interaktif.</p></div>';
         }
@@ -105,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- EVENT LISTENERS ---
-    // Hanya tambahkan listener jika elemennya ada (bukan di halaman player)
     if (uploadArea) uploadArea.addEventListener('click', () => videoUpload.click());
     if (videoUpload) videoUpload.addEventListener('change', handleVideoUpload);
     if (addZoneBtn) addZoneBtn.addEventListener('click', addNewZone);
@@ -144,8 +139,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentEditingZoneId !== null) {
             const zoneEl = document.getElementById(`zone-${currentEditingZoneId}`);
             if (zoneEl) {
-                zoneEl.style.backgroundColor = `rgba(0, 123, 255, ${opacity})`;
-                zoneEl.style.borderColor = `rgba(0, 123, 255, ${Math.max(opacity, 0.5)})`;
+                // Kita tidak lagi menggunakan opacity untuk zona, tapi kita simpan saja untuk data
+                // Tidak ada perubahan visual yang perlu dilakukan di sini
             }
         }
     });
@@ -198,12 +193,8 @@ document.addEventListener('DOMContentLoaded', () => {
         zoneEl.style.width = `${zone.width}%`;
         zoneEl.style.height = `${zone.height}%`;
         
-        const opacity = zone.opacity || 0.4;
-        zoneEl.style.backgroundColor = `rgba(0, 123, 255, ${opacity})`;
-        zoneEl.style.borderColor = `rgba(0, 123, 255, ${Math.max(opacity, 0.5)})`;
-        
-        // Di halaman player, tidak ada tombol edit
-        zoneEl.innerHTML = isPlayerPage ? zone.cta : `${zone.cta}<i class="fas fa-edit edit-icon" title="Edit"></i>`;
+        // PERUBAHAN: Tampilkan ikon play, bukan teks CTA
+        zoneEl.innerHTML = `<i class="fas fa-play play-icon"></i>${isPlayerPage ? '' : '<i class="fas fa-edit edit-icon" title="Edit"></i>'}`;
         
         const editIcon = zoneEl.querySelector('.edit-icon');
         if (editIcon) {
@@ -252,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNGSI MODAL ---
     function openModal(zoneId) {
-        if (isPlayerPage) return; // Tidak ada modal di halaman player
+        if (isPlayerPage) return;
         currentEditingZoneId = zoneId;
         const zone = zones.find(z => z.id === zoneId);
         zoneCtaInput.value = zone.cta || '';
@@ -292,11 +283,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const dataToEncode = JSON.stringify(zones);
         const encodedData = encodeURIComponent(dataToEncode);
         const videoUrl = videoUrlInput.value;
-        
-        // !!! PERUBAHAN PENTING: Gunakan player.html untuk link shareable !!!
         const baseUrl = window.location.origin + window.location.pathname.replace('index.html', 'player.html');
         const newUrl = `${baseUrl}?data=${encodedData}&video=${encodeURIComponent(videoUrl)}&autoplay=true`;
-        
         shareableLink.value = newUrl;
         shareOutput.classList.remove('hidden');
     }
@@ -345,15 +333,32 @@ document.addEventListener('DOMContentLoaded', () => {
             const width = (zone.width / 100) * recordingCanvas.width;
             const height = (zone.height / 100) * recordingCanvas.height;
             
-            const opacity = zone.opacity || 0.4;
-            ctx.strokeStyle = `rgba(0, 123, 255, ${Math.max(opacity, 0.5)})`;
+            // PERUBAHAN: Gambar ikon play di canvas, bukan teks
+            ctx.fillStyle = 'white';
+            ctx.strokeStyle = 'white';
             ctx.lineWidth = 3;
-            ctx.strokeRect(x, y, width, height);
-            ctx.fillStyle = `rgba(0, 123, 255, ${opacity})`;
-            ctx.fillRect(x, y, width, height);
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+
+            // Mulai menggambar segitiga play
+            ctx.beginPath();
+            // Pindah ke titik awal (ujung kiri atas segitiga)
+            ctx.moveTo(x + width * 0.35, y + height * 0.25);
+            // Gambar garis ke titik kedua (ujung kiri bawah)
+            ctx.lineTo(x + width * 0.35, y + height * 0.75);
+            // Gambar garis ke titik ketiga (ujung kanan tengah)
+            ctx.lineTo(x + width * 0.75, y + height * 0.5);
+            // Tutup path untuk kembali ke titik awal
+            ctx.closePath();
+            ctx.fill(); // Isi segitiga dengan warna putih
             
-            ctx.fillStyle = 'white'; ctx.font = 'bold 20px Poppins'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillText(zone.cta, x + width / 2, y + height / 2);
+            // Reset shadow agar tidak mempengaruhi gambar lain
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
         });
         if (videoPlayer.currentTime < videoPlayer.duration) {
             animationFrameId = requestAnimationFrame(drawCanvas);
@@ -378,7 +383,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!token) { alert('Token Akses GitHub diperlukan.'); return; }
         uploadProgress.classList.remove('hidden'); uploadResult.classList.add('hidden');
         
-        // !!! PENTING: UBAH BAGIAN INI !!!
         const githubUsername = 'video-interactive';
         const repoName = 'src';
         const path = `videos/${uploadedFile.name}`;
@@ -390,36 +394,17 @@ document.addEventListener('DOMContentLoaded', () => {
             let fileSha = null;
 
             try {
-                const getResponse = await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: { 'Authorization': `token ${token}` }
-                });
+                const getResponse = await fetch(apiUrl, { method: 'GET', headers: { 'Authorization': `token ${token}` } });
+                if (getResponse.ok) { const fileData = await getResponse.json(); fileSha = fileData.sha; }
+                else if (getResponse.status !== 404) { throw new Error(`Gagal mengecek file: ${getResponse.statusText}`); }
 
-                if (getResponse.ok) {
-                    const fileData = await getResponse.json();
-                    fileSha = fileData.sha;
-                } else if (getResponse.status !== 404) {
-                    throw new Error(`Gagal mengecek file: ${getResponse.statusText}`);
-                }
-
-                const body = {
-                    message: `${fileSha ? 'Memperbarui' : 'Menambahkan'} video: ${uploadedFile.name}`,
-                    content: base64content,
-                };
-                if (fileSha) {
-                    body.sha = fileSha;
-                }
+                const body = { message: `${fileSha ? 'Memperbarui' : 'Menambahkan'} video: ${uploadedFile.name}`, content: base64content, };
+                if (fileSha) { body.sha = fileSha; }
 
                 const putResponse = await fetch(apiUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${token}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json',
-                    },
+                    method: 'PUT', headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json', },
                     body: JSON.stringify(body)
                 });
-
                 const result = await putResponse.json();
                 if (putResponse.ok && result.content) {
                     const videoUrl = result.content.download_url;
@@ -430,7 +415,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     throw new Error(result.message || 'Gagal mengunggah file ke GitHub.');
                 }
-
             } catch (error) {
                 console.error(error);
                 uploadProgress.classList.add('hidden');
@@ -444,8 +428,53 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- FUNGSI INTERACT.JS ---
     function setupInteractJS(element) {
         interact(element)
-            .draggable({ /* ... */ })
-            .resizable({ /* ... */ });
+            .draggable({
+                listeners: {
+                    move(event) {
+                        const target = event.target;
+                        const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                        const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+                        const parentRect = target.parentElement.getBoundingClientRect();
+                        const xPercent = (x / parentRect.width) * 100;
+                        const yPercent = (y / parentRect.height) * 100;
+                        target.style.left = `${xPercent}%`;
+                        target.style.top = `${yPercent}%`;
+                        target.setAttribute('data-x', x);
+                        target.setAttribute('data-y', y);
+                        const zoneId = parseInt(target.id.split('-')[1]);
+                        const zone = zones.find(z => z.id === zoneId);
+                        if (zone) { zone.x = xPercent; zone.y = yPercent; }
+                    }
+                },
+                modifiers: [ interact.modifiers.restrictRect({ restriction: 'parent', endOnly: true }) ]
+            })
+            .resizable({
+                edges: { left: true, right: true, bottom: true, top: true },
+                listeners: {
+                    move(event) {
+                        const target = event.target;
+                        let x = (parseFloat(target.getAttribute('data-x')) || 0);
+                        let y = (parseFloat(target.getAttribute('data-y')) || 0);
+                        target.style.width = `${event.rect.width}px`;
+                        target.style.height = `${event.rect.height}px`;
+                        x += event.deltaRect.left; y += event.deltaRect.top;
+                        target.style.left = `${x}px`; target.style.top = `${y}px`;
+                        const parentRect = target.parentElement.getBoundingClientRect();
+                        const xPercent = (x / parentRect.width) * 100;
+                        const yPercent = (y / parentRect.height) * 100;
+                        const widthPercent = (event.rect.width / parentRect.width) * 100;
+                        const heightPercent = (event.rect.height / parentRect.height) * 100;
+                        target.style.left = `${xPercent}%`; target.style.top = `${yPercent}%`;
+                        target.style.width = `${widthPercent}%`; target.style.height = `${heightPercent}%`;
+                        target.setAttribute('data-x', x); target.setAttribute('data-y', y);
+                        const zoneId = parseInt(target.id.split('-')[1]);
+                        const zone = zones.find(z => z.id === zoneId);
+                        if (zone) { zone.x = xPercent; zone.y = yPercent; zone.width = widthPercent; zone.height = heightPercent; }
+                    }
+                },
+                modifiers: [ interact.modifiers.restrictEdges({ outer: 'parent' }), interact.modifiers.restrictSize({ min: { width: 50, height: 50 } }) ],
+                inertia: true
+            });
     }
     interact.maxInteractions(Infinity);
 });
