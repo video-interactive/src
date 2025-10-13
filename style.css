@@ -114,23 +114,54 @@ main { flex-grow: 1; padding: 2rem; display: flex; justify-content: center; alig
 /* Gaya Baru untuk Zona */
 .clickable-zone {
     position: absolute;
-    background-color: rgba(0, 123, 255, 0.4);
-    border: 2px solid var(--primary-color);
-    cursor: move;
+    /* Hapus background dan border default */
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-weight: bold;
-    font-size: 0.9rem;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     box-sizing: border-box;
-    transition: background-color 0.2s;
+    /* Tambahkan transisi untuk efek hover yang halus */
+    transition: transform 0.2s ease-in-out;
 }
+
+/* Gaya untuk Ikon Play di dalam Zona */
+.clickable-zone .play-icon {
+    color: white;
+    font-size: 3rem; /* Ukuran ikon yang besar */
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); /* Bayangan agar ikon terlihat jelas di video apa pun */
+    opacity: 0.9;
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
 .clickable-zone:hover {
     background-color: rgba(0, 123, 255, 0.6);
 }
 /* Ikon Edit di dalam Zona */
+.clickable-zone .edit-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+/* Efek Hover saat kursor di atas zona */
+.clickable-zone:hover {
+    transform: scale(1.05); /* Zona sedikit membesar */
+}
+.clickable-zone:hover .play-icon {
+    opacity: 1;
+    transform: scale(1.1); /* Ikon play lebih besar lagi saat hover */
+}
+
+/* Gaya untuk Ikon Edit (tidak berubah) */
 .clickable-zone .edit-icon {
     position: absolute;
     top: 5px;
