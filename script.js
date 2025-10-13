@@ -37,9 +37,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal
     const linkModal = document.getElementById('link-modal');
     const closeBtn = document.querySelector('.close-btn');
-    // ELEMEN BARU untuk CTA
     const zoneCtaInput = document.getElementById('zone-cta-input');
     const zoneLinkInput = document.getElementById('zone-link-input');
+    // ELEMEN BARU untuk Transparansi
+    const zoneOpacityInput = document.getElementById('zone-opacity-input');
+    const zoneOpacityValue = document.getElementById('zone-opacity-value');
     const saveLinkBtn = document.getElementById('save-link-btn');
     const cancelLinkBtn = document.getElementById('cancel-link-btn');
 
@@ -51,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let recordedChunks = [];
     let isRecording = false;
     let animationFrameId;
-    let uploadedFile = null; // Menyimpan file yang diunggah
+    let uploadedFile = null;
 
     // --- INISIALISASI ---
     const urlParams = new URLSearchParams(window.location.search);
@@ -73,13 +75,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Cek token di localStorage
     const savedToken = localStorage.getItem('github_pat');
     if (savedToken) {
         githubTokenInput.value = savedToken;
     }
 
-    // Logika untuk memutar video otomatis jika parameter 'autoplay' ada
     const autoplayParam = urlParams.get('autoplay');
     if (autoplayParam === 'true') {
         videoPlayer.addEventListener('loadedmetadata', () => {
@@ -121,6 +121,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // EVENT LISTENER BARU untuk real-time preview transparansi
+    zoneOpacityInput.addEventListener('input', (e) => {
+        const opacity = e.target.value;
+        zoneOpacityValue.textContent = `${Math.round(opacity * 100)}%`;
+        if (currentEditingZoneId !== null) {
+            const zoneEl = document.getElementById(`zone-${currentEditingZoneId}`);
+            if (zoneEl) {
+                zoneEl.style.backgroundColor = `rgba(0, 123, 255, ${opacity})`;
+                zoneEl.style.borderColor = `rgba(0, 123, 255, ${Math.max(opacity, 0.5)})`;
+            }
+        }
+    });
+
     closeBtn.addEventListener('click', closeModal);
     cancelLinkBtn.addEventListener('click', closeModal);
     saveLinkBtn.addEventListener('click', saveZoneLink);
@@ -154,7 +167,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNGSI ZONA ---
     function addNewZone() {
-        const newZone = { id: zoneIdCounter++, x: 10, y: 10, width: 20, height: 20, link: '', cta: 'Klik di sini' };
+        // PERUBAHAN: Tambahkan properti 'cta' dan 'opacity'
+        const newZone = { id: zoneIdCounter++, x: 10, y: 10, width: 20, height: 20, link: '', cta: 'Klik di sini', opacity: 0.4 };
         zones.push(newZone);
         renderZone(newZone);
         updateZonesList();
@@ -168,6 +182,12 @@ document.addEventListener('DOMContentLoaded', () => {
         zoneEl.style.top = `${zone.y}%`;
         zoneEl.style.width = `${zone.width}%`;
         zoneEl.style.height = `${zone.height}%`;
+        
+        // PERUBAHAN: Gunakan properti opacity untuk styling
+        const opacity = zone.opacity || 0.4;
+        zoneEl.style.backgroundColor = `rgba(0, 123, 255, ${opacity})`;
+        zoneEl.style.borderColor = `rgba(0, 123, 255, ${Math.max(opacity, 0.5)})`;
+        
         zoneEl.innerHTML = `${zone.cta}<i class="fas fa-edit edit-icon" title="Edit"></i>`;
         
         const editIcon = zoneEl.querySelector('.edit-icon');
@@ -202,7 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="btn btn-secondary" onclick="openModal(${zone.id})">Edit</button>
                     <button class="btn btn-danger" onclick="deleteZone(${zone.id})">Hapus</button>
                 </div>
-
             `;
             zonesList.appendChild(li);
         });
@@ -216,12 +235,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- FUNGSI MODAL ---
     function openModal(zoneId) {
         currentEditingZoneId = zoneId;
-      const zone = zones.find(z => z.id === zoneId);
-        // PERUBAHAN: Isi input CTA dan Link
+        const zone = zones.find(z => z.id === zoneId);
         zoneCtaInput.value = zone.cta || '';
         zoneLinkInput.value = zone.link || '';
+        
+        // PERUBAHAN: Isi input opacity dan tampilkan nilainya
+        const opacity = zone.opacity || 0.4;
+        zoneOpacityInput.value = opacity;
+        zoneOpacityValue.textContent = `${Math.round(opacity * 100)}%`;
+        
         linkModal.classList.remove('hidden');
-
     }
 
     function closeModal() {
@@ -232,30 +255,28 @@ document.addEventListener('DOMContentLoaded', () => {
     function saveZoneLink() {
         const zone = zones.find(z => z.id === currentEditingZoneId);
         if (zone) {
-             // PERUBAHAN: Simpan nilai CTA dan Link
             zone.cta = zoneCtaInput.value || 'Klik di sini';
             zone.link = zoneLinkInput.value;
+            // PERUBAHAN: Simpan nilai opacity
+            zone.opacity = parseFloat(zoneOpacityInput.value);
             updateZonesList();
-            renderAllZones(); // Render ulang untuk memperbarui teks di zona
+            renderAllZones(); // Render ulang untuk memperbarui tampilan
         }
         closeModal();
     }
 
     // --- FUNGSI SHARE & REKAM ---
     function generateShareableLink() {
-        // !!! VALIDASI BARU !!!
         if (!videoUrlInput.value) {
             alert('Untuk membuat link shareable yang lengkap, Anda harus mengunggah video ke GitHub terlebih dahulu. URL video diperlukan agar orang lain bisa melihatnya.');
             uploadToGithubBtn.scrollIntoView({ behavior: 'smooth' });
-            return; // Hentikan fungsi
+            return;
         }
-
         const dataToEncode = JSON.stringify(zones);
         const encodedData = encodeURIComponent(dataToEncode);
         const videoUrl = videoUrlInput.value;
         const baseUrl = window.location.origin + window.location.pathname;
         const newUrl = `${baseUrl}?data=${encodedData}&video=${encodeURIComponent(videoUrl)}&autoplay=true`;
-        
         shareableLink.value = newUrl;
         shareOutput.classList.remove('hidden');
     }
@@ -303,10 +324,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const y = (zone.y / 100) * recordingCanvas.height;
             const width = (zone.width / 100) * recordingCanvas.width;
             const height = (zone.height / 100) * recordingCanvas.height;
-            ctx.strokeStyle = '#007bff'; ctx.lineWidth = 3; ctx.strokeRect(x, y, width, height);
-            ctx.fillStyle = 'rgba(0, 123, 255, 0.4)'; ctx.fillRect(x, y, width, height);
+            
+            // PERUBAHAN: Gunakan opacity saat menggambar di canvas
+            const opacity = zone.opacity || 0.4;
+            ctx.strokeStyle = `rgba(0, 123, 255, ${Math.max(opacity, 0.5)})`;
+            ctx.lineWidth = 3;
+            ctx.strokeRect(x, y, width, height);
+            ctx.fillStyle = `rgba(0, 123, 255, ${opacity})`;
+            ctx.fillRect(x, y, width, height);
+            
             ctx.fillStyle = 'white'; ctx.font = 'bold 20px Poppins'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-             ctx.fillText(zone.cta, x + width / 2, y + height / 2);
+            ctx.fillText(zone.cta, x + width / 2, y + height / 2);
         });
         if (videoPlayer.currentTime < videoPlayer.duration) {
             animationFrameId = requestAnimationFrame(drawCanvas);
@@ -332,8 +360,8 @@ document.addEventListener('DOMContentLoaded', () => {
         uploadProgress.classList.remove('hidden'); uploadResult.classList.add('hidden');
         
         // !!! PENTING: UBAH BAGIAN INI !!!
-        const githubUsername = 'video-interactive'; // Ganti dengan username Anda
-        const repoName = 'src'; // Ganti dengan nama repository Anda
+        const githubUsername = 'USERNAME_GITHUB_ANDA';
+        const repoName = 'NAMA_REPO_ANDA';
         const path = `videos/${uploadedFile.name}`;
 
         const reader = new FileReader();
@@ -369,7 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsDataURL(uploadedFile);
     }
 
-    // --- FUNGSI INTERACT.JS YANG BENAR ---
+    // --- FUNGSI INTERACT.JS ---
     function setupInteractJS(element) {
         interact(element)
             .draggable({
@@ -428,21 +456,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     interact.maxInteractions(Infinity);
 });
-/* ... (semua CSS sebelumnya tetap sama) ... */
-
-/* Gaya Baru untuk Slider Transparansi */
-.slider-container {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-#zone-opacity-input {
-    flex-grow: 1; /* Membuat slider mengambil ruang yang tersisa */
-}
-
-#zone-opacity-value {
-    min-width: 40px; /* Memberikan lebar tetap untuk persentase */
-    text-align: right;
-    font-weight: 600;
-}
