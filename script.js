@@ -310,54 +310,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- FUNGSI UPLOAD GITHUB ---
-    async function triggerUpload() {
-        if (!uploadedFile) { alert('Silakan pilih file video terlebih dahulu.'); return; }
-        const token = githubTokenInput.value;
-        if (!token) { alert('Token Akses GitHub diperlukan.'); return; }
-
-        uploadProgress.classList.remove('hidden');
-        uploadResult.classList.add('hidden');
-
-        // !!! PENTING: UBAH BAGIAN INI !!!
-        const video-interactive = 'video-interactive'; // Ganti dengan username Anda
-        const src = 'src'; // Ganti dengan nama repository Anda
-
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            const base64data = reader.result.split(',')[1];
-            const payload = {
-                event_type: 'video-upload-event',
-                client_payload: { filename: uploadedFile.name, content: base64data }
-            };
-            try {
-                const response = await fetch(`https://api.github.com/repos/${video-interactive}/${src}/dispatches`, {
-                    method: 'POST', headers: {
-                        'Authorization': `token ${token}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json',
-                    }, body: JSON.stringify(payload)
-                });
-                if (response.ok) {
-                    setTimeout(() => {
-                        const videoUrl = `https://raw.githubusercontent.com/${video-interactive}/${src}/main/videos/${uploadedFile.name}`;
-                        videoUrlInput.value = videoUrl;
-                        uploadProgress.classList.add('hidden');
-                        uploadResult.textContent = `✅ Upload berhasil! Video tersimpan di: videos/${uploadedFile.name}`;
-                        uploadResult.className = 'success'; uploadResult.classList.remove('hidden');
-                    }, 15000); // Tunggu 15 detik agar Actions selesai
-                } else {
-                    throw new Error('Gagal mengirim perintah ke GitHub Actions.');
-                }
-            } catch (error) {
-                console.error(error);
-                uploadProgress.classList.add('hidden');
-                uploadResult.textContent = `❌ Error: ${error.message}`;
-                uploadResult.className = 'error'; uploadResult.classList.remove('hidden');
-            }
-        };
-        reader.readAsDataURL(uploadedFile);
+   // --- FUNGSI UPLOAD GITHUB (VERSI BARU & LEBIH ANDAL) ---
+async function triggerUpload() {
+    if (!uploadedFile) {
+        alert('Silakan pilih file video terlebih dahulu.');
+        return;
     }
 
+    const token = githubTokenInput.value || localStorage.getItem('github_pat');
+    if (!token) {
+        alert('Token Akses GitHub diperlukan.');
+        return;
+    }
+
+    // Tampilkan progress
+    uploadProgress.classList.remove('hidden');
+    uploadResult.classList.add('hidden');
+
+    // !!! PENTING: PASTIKAN BAGIAN INI SUDAH BENAR !!!
+    const githubUsername = 'video-interactive'; // Ganti dengan username Anda
+    const repoName = 'src'; // Ganti dengan nama repository Anda
+    const path = `videos/${uploadedFile.name}`; // Path tempat file akan disimpan
+
+    // Baca file sebagai Base64
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+        const base64content = reader.result.split(',')[1];
+
+        const apiUrl = `https://api.github.com/repos/${githubUsername}/${repoName}/contents/${path}`;
+
+        const body = {
+            message: `Menambahkan video baru: ${uploadedFile.name}`,
+            content: base64content
+        };
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body)
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.content) {
+                // URL file yang di-upload
+                const videoUrl = result.content.download_url;
+                videoUrlInput.value = videoUrl;
+
+                uploadProgress.classList.add('hidden');
+                uploadResult.textContent = `✅ Upload berhasil! Video tersimpan di: ${path}`;
+                uploadResult.className = 'success';
+                uploadResult.classList.remove('hidden');
+            } else {
+                // Tampilkan error dari GitHub jika ada
+                throw new Error(result.message || 'Gagal mengunggah file ke GitHub.');
+            }
+        } catch (error) {
+            console.error(error);
+            uploadProgress.classList.add('hidden');
+            uploadResult.textContent = `❌ Error: ${error.message}`;
+            uploadResult.className = 'error';
+            uploadResult.classList.remove('hidden');
+        }
+    };
+    reader.readAsDataURL(uploadedFile);
+}
     // --- INTERACT.JS SETUP ---
     function setupInteractJS(element) {
         interact(element)
