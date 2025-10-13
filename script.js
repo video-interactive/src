@@ -76,6 +76,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (savedToken) {
         githubTokenInput.value = savedToken;
     }
+    // Logika untuk memutar video otomatis jika parameter 'autoplay' ada
+    const autoplayParam = urlParams.get('autoplay');
+    if (autoplayParam === 'true') {
+        // Tunggu hingga metadata video dimuat sebelum mencoba memutar
+        videoPlayer.addEventListener('loadedmetadata', () => {
+            // Browser modern memerlukan video dalam keadaan 'muted' untuk autoplay
+            videoPlayer.muted = true; 
+            videoPlayer.play().catch(error => {
+                console.error("Autoplay dicegah oleh browser:", error);
+                // Anda bisa menambahkan UI di sini untuk meminta user mengklik play jika gagal
+            });
+        }, { once: true }); // Listener akan dihapus setelah dijalankan sekali
+    }
+
 
     // --- EVENT LISTENERS ---
     uploadArea.addEventListener('click', () => videoUpload.click());
@@ -233,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const encodedData = encodeURIComponent(dataToEncode);
         const videoUrl = videoUrlInput.value || '';
         const baseUrl = window.location.origin + window.location.pathname;
-        const newUrl = `${baseUrl}?data=${encodedData}${videoUrl ? '&video=' + encodeURIComponent(videoUrl) : ''}`;
+        const newUrl = `${baseUrl}?data=${encodedData}${videoUrl ? '&video=' + encodeURIComponent(videoUrl) : ''}&autoplay=true`;
         shareableLink.value = newUrl;
         shareOutput.classList.remove('hidden');
     }
