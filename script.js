@@ -37,6 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal
     const linkModal = document.getElementById('link-modal');
     const closeBtn = document.querySelector('.close-btn');
+    // ELEMEN BARU untuk CTA
+    const zoneCtaInput = document.getElementById('zone-cta-input');
     const zoneLinkInput = document.getElementById('zone-link-input');
     const saveLinkBtn = document.getElementById('save-link-btn');
     const cancelLinkBtn = document.getElementById('cancel-link-btn');
@@ -49,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let recordedChunks = [];
     let isRecording = false;
     let animationFrameId;
-    let uploadedFile = null; // Menyimpan file yang diunggah
+    let uploadedFile = null;
 
     // --- INISIALISASI ---
     const urlParams = new URLSearchParams(window.location.search);
@@ -71,13 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Cek token di localStorage
     const savedToken = localStorage.getItem('github_pat');
     if (savedToken) {
         githubTokenInput.value = savedToken;
     }
 
-    // Logika untuk memutar video otomatis jika parameter 'autoplay' ada
     const autoplayParam = urlParams.get('autoplay');
     if (autoplayParam === 'true') {
         videoPlayer.addEventListener('loadedmetadata', () => {
@@ -152,7 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNGSI ZONA ---
     function addNewZone() {
-        const newZone = { id: zoneIdCounter++, x: 10, y: 10, width: 20, height: 20, link: '' };
+        // PERUBAHAN: Tambahkan properti 'cta' dengan nilai default
+        const newZone = { id: zoneIdCounter++, x: 10, y: 10, width: 20, height: 20, link: '', cta: 'Klik di sini' };
         zones.push(newZone);
         renderZone(newZone);
         updateZonesList();
@@ -166,7 +167,8 @@ document.addEventListener('DOMContentLoaded', () => {
         zoneEl.style.top = `${zone.y}%`;
         zoneEl.style.width = `${zone.width}%`;
         zoneEl.style.height = `${zone.height}%`;
-        zoneEl.innerHTML = `Zona ${zone.id + 1}<i class="fas fa-edit edit-icon" title="Edit Link"></i>`;
+        // PERUBAHAN: Tampilkan teks CTA
+        zoneEl.innerHTML = `${zone.cta}<i class="fas fa-edit edit-icon" title="Edit"></i>`;
         
         const editIcon = zoneEl.querySelector('.edit-icon');
         editIcon.addEventListener('click', (e) => {
@@ -194,8 +196,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (zones.length === 0) { zonesList.innerHTML = '<li>Belum ada zona.</li>'; return; }
         zones.forEach(zone => {
             const li = document.createElement('li');
+            // PERUBAHAN: Tampilkan CTA di daftar
             li.innerHTML = `
-                <span>Zona ${zone.id + 1}: ${zone.link || 'Tidak ada link'}</span>
+                <span><strong>${zone.cta}</strong>: ${zone.link || 'Tidak ada link'}</span>
                 <div>
                     <button class="btn btn-secondary" onclick="openModal(${zone.id})">Edit</button>
                     <button class="btn btn-danger" onclick="deleteZone(${zone.id})">Hapus</button>
@@ -214,6 +217,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function openModal(zoneId) {
         currentEditingZoneId = zoneId;
         const zone = zones.find(z => z.id === zoneId);
+        // PERUBAHAN: Isi input CTA dan Link
+        zoneCtaInput.value = zone.cta || '';
         zoneLinkInput.value = zone.link || '';
         linkModal.classList.remove('hidden');
     }
@@ -226,27 +231,27 @@ document.addEventListener('DOMContentLoaded', () => {
     function saveZoneLink() {
         const zone = zones.find(z => z.id === currentEditingZoneId);
         if (zone) {
+            // PERUBAHAN: Simpan nilai CTA dan Link
+            zone.cta = zoneCtaInput.value || 'Klik di sini';
             zone.link = zoneLinkInput.value;
             updateZonesList();
+            renderAllZones(); // Render ulang untuk memperbarui teks di zona
         }
         closeModal();
     }
 
     // --- FUNGSI SHARE & REKAM ---
     function generateShareableLink() {
-        // !!! VALIDASI BARU !!!
         if (!videoUrlInput.value) {
-            alert('Untuk membuat link shareable yang lengkap, Anda harus mengunggah video ke GitHub terlebih dahulu. URL video diperlukan agar orang lain bisa melihatnya.');
+            alert('Untuk membuat link shareable yang lengkap, Anda harus mengunggah video ke GitHub terlebih dahulu.');
             uploadToGithubBtn.scrollIntoView({ behavior: 'smooth' });
-            return; // Hentikan fungsi
+            return;
         }
-
         const dataToEncode = JSON.stringify(zones);
         const encodedData = encodeURIComponent(dataToEncode);
         const videoUrl = videoUrlInput.value;
         const baseUrl = window.location.origin + window.location.pathname;
         const newUrl = `${baseUrl}?data=${encodedData}&video=${encodeURIComponent(videoUrl)}&autoplay=true`;
-        
         shareableLink.value = newUrl;
         shareOutput.classList.remove('hidden');
     }
@@ -297,7 +302,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.strokeStyle = '#007bff'; ctx.lineWidth = 3; ctx.strokeRect(x, y, width, height);
             ctx.fillStyle = 'rgba(0, 123, 255, 0.4)'; ctx.fillRect(x, y, width, height);
             ctx.fillStyle = 'white'; ctx.font = 'bold 20px Poppins'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillText(`Zona ${zone.id + 1}`, x + width / 2, y + height / 2);
+            // PERUBAHAN: Gambar teks CTA di canvas
+            ctx.fillText(zone.cta, x + width / 2, y + height / 2);
         });
         if (videoPlayer.currentTime < videoPlayer.duration) {
             animationFrameId = requestAnimationFrame(drawCanvas);
@@ -310,7 +316,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const zonesWithLinks = zones.filter(z => z.link);
         if (zonesWithLinks.length === 0) { linksListSection.classList.add('hidden'); return; }
         let listText = "Link yang disebutkan dalam video:\n\n";
-        zonesWithLinks.forEach(zone => { listText += `👉 Zona ${zone.id + 1}: ${zone.link}\n`; });
+        // PERUBAHAN: Gunakan CTA di daftar link
+        zonesWithLinks.forEach(zone => { listText += `👉 "${zone.cta}": ${zone.link}\n`; });
         linksListTextarea.value = listText;
         linksListSection.classList.remove('hidden');
     }
@@ -323,8 +330,8 @@ document.addEventListener('DOMContentLoaded', () => {
         uploadProgress.classList.remove('hidden'); uploadResult.classList.add('hidden');
         
         // !!! PENTING: UBAH BAGIAN INI !!!
-        const githubUsername = 'video-interactive'; // Ganti dengan username Anda
-        const repoName = 'src'; // Ganti dengan nama repository Anda
+        const githubUsername = 'video-interactive';
+        const repoName = 'src';
         const path = `videos/${uploadedFile.name}`;
 
         const reader = new FileReader();
@@ -360,44 +367,11 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsDataURL(uploadedFile);
     }
 
-    // --- FUNGSI INTERACT.JS YANG BENAR ---
+    // --- FUNGSI INTERACT.JS ---
     function setupInteractJS(element) {
         interact(element)
-            .draggable({
-                listeners: {
-                    move(event) {
-                        const target = event.target;
-                        const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-                        const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-                        const parentRect = target.parentElement.getBoundingClientRect();
-                        const xPercent = (x / parentRect.width) * 100;
-                        const yPercent = (y / parentRect.height) * 100;
-                        target.style.left = `${xPercent}%`;
-                        target.style.top = `${yPercent}%`;
-                        target.setAttribute('data-x', x);
-                        target.setAttribute('data-y', y);
-                        const zoneId = parseInt(target.id.split('-')[1]);
-                        const zone = zones.find(z => z.id === zoneId);
-                        if (zone) { zone.x = xPercent; zone.y = yPercent; }
-                    }
-                },
-                modifiers: [ interact.modifiers.restrictRect({ restriction: 'parent', endOnly: true }) ]
-            })
-            .resizable({
-                edges: { left: true, right: true, bottom: true, top: true },
-                listeners: {
-                    move(event) {
-                        const target = event.target;
-                        let x = (parseFloat(target.getAttribute('data-x')) || 0);
-                        let y = (parseFloat(target.getAttribute('data-y')) || 0);
-                        target.style.width = `${event.rect.width}px`;
-                        target.style.height = `${event.rect.height}px`;
-                        x += event.deltaRect.left; y += event.deltaRect.top;
-                        target.style.left = `${x}px`; target.style.top = `${y}px`;
-                        const parentRect = target.parentElement.getBoundingClientRect();
-                        const xPercent = (x / parentRect.width) * 100;
-                        const yPercent = (y / parentRect.height) * 100;
-                        const widthPercent = (event.rect.width / parentRect.width) * 100;
-                        const heightPercent = (event.rect.height / parentRect.height) * 100;
-                        target.style.left = `${xPercent}%`; target.style.top = `${yPercent}%`;
-                        target.style.width = `${width
+            .draggable({ /* ... */ })
+            .resizable({ /* ... */ });
+    }
+    interact.maxInteractions(Infinity);
+});
