@@ -1,0 +1,33 @@
+name: Upload Video to Repository
+
+on:
+  repository_dispatch:
+    types: [video-upload-event]
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Decode and save video
+        run: |
+          # Mendapatkan nama file dan konten dari payload
+          FILENAME=$(echo '${{ github.event.client_payload.filename }}')
+          CONTENT=$(echo '${{ github.event.client_payload.content }}')
+          
+          # Membuat folder 'videos' jika belum ada
+          mkdir -p videos
+          
+          # Mendekode konten Base64 dan menyimpannya
+          echo $CONTENT | base64 -d > "videos/$FILENAME"
+          
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Menambahkan video baru: ${{ github.event.client_payload.filename }}"
+          branch: main
+          file_pattern: 'videos/*'
