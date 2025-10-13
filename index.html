@@ -116,21 +116,30 @@
     </main>
 
     <!-- Modal untuk Edit Link Zona -->
-    <div id="link-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-btn">&times;</span>
-               <h3>Edit Zona Interaktif</h3>
+<div id="link-modal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h3>Edit Zona Interaktif</h3>
         
-        <!-- Input Baru untuk Teks CTA -->
         <label for="zone-cta-input">Teks Ajakan (CTA):</label>
         <input type="text" id="zone-cta-input" placeholder="Contoh: Beli Sekarang">
-            <input type="url" id="zone-link-input" placeholder="https://contoh.com">
-            <div class="modal-actions">
-                <button id="save-link-btn" class="btn btn-primary">Simpan</button>
-                <button id="cancel-link-btn" class="btn btn-secondary">Batal</button>
-            </div>
+        
+        <label for="zone-link-input">Link Tujuan:</label>
+        <input type="url" id="zone-link-input" placeholder="https://contoh.com">
+
+        <!-- TAMBAHKAN SLIDER TRANSPARANSI DI SINI -->
+        <label for="zone-opacity-input">Transparansi Zona:</label>
+        <div class="slider-container">
+            <input type="range" id="zone-opacity-input" min="0" max="1" step="0.1" value="0.4">
+            <span id="zone-opacity-value">40%</span>
+        </div>
+        
+        <div class="modal-actions">
+            <button id="save-link-btn" class="btn btn-primary">Simpan</button>
+            <button id="cancel-link-btn" class="btn btn-secondary">Batal</button>
         </div>
     </div>
+</div>
 
     <!-- Canvas tersembunyi untuk perekaman -->
     <canvas id="recording-canvas" class="hidden"></canvas>
