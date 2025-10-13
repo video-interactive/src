@@ -20,198 +20,98 @@ body {
     min-height: 100vh;
 }
 
+/* ... (Header, Main, Upload Section, Editor Section, Controls Panel tetap sama) ... */
 header {
     background-color: var(--card-background);
     padding: 1.5rem;
     text-align: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
+header h1 { margin: 0; color: var(--primary-color); }
+header p { margin: 0.5rem 0 0; color: var(--secondary-color); }
+main { flex-grow: 1; padding: 2rem; display: flex; justify-content: center; align-items: center; }
+#upload-section { width: 100%; max-width: 500px; }
+.upload-area { border: 3px dashed var(--primary-color); border-radius: 10px; padding: 3rem; text-align: center; cursor: pointer; transition: background-color 0.3s, border-color 0.3s; background-color: var(--card-background); }
+.upload-area:hover, .upload-area.dragover { background-color: #e9f5ff; border-color: #0056b3; }
+.upload-area i.fa-cloud-upload-alt { color: var(--primary-color); font-size: 3rem; margin-bottom: 1rem; }
+#editor-section { width: 100%; max-width: 1400px; }
+.editor-container { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; background-color: var(--card-background); padding: 2rem; border-radius: 10px; box-shadow: var(--shadow); }
+.video-wrapper { position: relative; background-color: #000; border-radius: 8px; overflow: hidden; }
+#video-player { width: 100%; height: auto; display: block; }
+#zones-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.controls-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+.control-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+.control-group input { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 5px; box-sizing: border-box; }
+.zones-list-container { max-height: 300px; overflow-y: auto; border: 1px solid var(--border-color); padding: 1rem; border-radius: 5px; }
+#zones-list { list-style: none; padding: 0; margin: 0; }
+#zones-list li { background-color: var(--background-color); padding: 0.75rem; border-radius: 5px; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; word-break: break-all; }
 
-header h1 {
-    margin: 0;
-    color: var(--primary-color);
-}
-
-header p {
-    margin: 0.5rem 0 0;
-    color: var(--secondary-color);
-}
-
-main {
-    flex-grow: 1;
-    padding: 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Upload Section */
-#upload-section {
-    width: 100%;
-    max-width: 500px;
-}
-
-.upload-area {
-    border: 3px dashed var(--primary-color);
-    border-radius: 10px;
-    padding: 3rem;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color 0.3s, border-color 0.3s;
-    background-color: var(--card-background);
-}
-
-.upload-area:hover, .upload-area.dragover {
-    background-color: #e9f5ff;
-    border-color: #0056b3;
-}
-
-.upload-area svg {
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-}
-
-/* Editor Section */
-#editor-section {
-    width: 100%;
-    max-width: 1400px;
-}
-
-.editor-container {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 2rem;
-    background-color: var(--card-background);
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-}
-
-.video-wrapper {
-    position: relative;
-    background-color: #000;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-#video-player {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
-#zones-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-/* Controls Panel */
-.controls-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.control-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-}
-
-.control-group input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-.zones-list-container {
-    max-height: 300px;
-    overflow-y: auto;
-    border: 1px solid var(--border-color);
-    padding: 1rem;
-    border-radius: 5px;
-}
-
-#zones-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#zones-list li {
-    background-color: var(--background-color);
-    padding: 0.75rem;
-    border-radius: 5px;
-    margin-bottom: 0.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    word-break: break-all;
-}
-
-/* Buttons */
-.btn {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.1s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-}
-
-.btn:active {
-    transform: translateY(0);
-}
-
+/* ... (Buttons tetap sama) ... */
+.btn { padding: 0.75rem 1.5rem; border: none; border-radius: 5px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s, transform 0.1s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
 .btn-primary { background-color: var(--primary-color); color: white; }
 .btn-primary:hover { background-color: #0056b3; }
-
 .btn-success { background-color: var(--success-color); color: white; }
 .btn-success:hover { background-color: #218838; }
-
-.btn-danger { background-color: var(--danger-color); color: white; padding: 0.5rem 1rem; font-size: 0.9rem;}
+.btn-danger { background-color: var(--danger-color); color: white; }
 .btn-danger:hover { background-color: #c82333; }
-
 .btn-secondary { background-color: var(--secondary-color); color: white; }
 .btn-secondary:hover { background-color: #5a6268; }
 
-/* Share Output */
-#share-output {
+/* Gaya Baru untuk Perekaman */
+#recording-indicator {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: rgba(220, 53, 69, 0.8);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 10;
+}
+.rec-dot {
+    width: 10px;
+    height: 10px;
+    background-color: white;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+#download-section {
     margin-top: 1rem;
     padding: 1rem;
-    background-color: #e9ecef;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
     border-radius: 5px;
+    text-align: center;
 }
-
-#share-output p {
-    margin: 0 0 0.5rem;
+#download-section p {
+    margin: 0 0 1rem;
     font-weight: 600;
+    color: #155724;
 }
 
-#shareable-link {
-    width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    background-color: white;
-}
+/* ... (Share Output, Modal, Utility Classes tetap sama) ... */
+#share-output { margin-top: 1rem; padding: 1rem; background-color: #e9ecef; border-radius: 5px; }
+#share-output p { margin: 0 0 0.5rem; font-weight: 600; }
+#shareable-link { width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; border: 1px solid var(--border-color); border-radius: 5px; background-color: white; }
+.modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; }
+.modal-content { background-color: var(--card-background); padding: 2rem; border-radius: 10px; width: 90%; max-width: 500px; position: relative; box-shadow: var(--shadow); }
+.close-btn { position: absolute; right: 1.5rem; top: 1.5rem; font-size: 2rem; font-weight: bold; cursor: pointer; color: var(--secondary-color); }
+.modal-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; }
+.hidden { display: none !important; }
 
-/* Clickable Zone */
+/* Gaya Baru untuk Zona */
 .clickable-zone {
     position: absolute;
     background-color: rgba(0, 123, 255, 0.4);
@@ -225,55 +125,25 @@ main {
     font-size: 0.9rem;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     box-sizing: border-box;
+    transition: background-color 0.2s;
 }
-
 .clickable-zone:hover {
     background-color: rgba(0, 123, 255, 0.6);
 }
-
-/* Modal */
-.modal {
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background-color: var(--card-background);
-    padding: 2rem;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 500px;
-    position: relative;
-    box-shadow: var(--shadow);
-}
-
-.close-btn {
+/* Ikon Edit di dalam Zona */
+.clickable-zone .edit-icon {
     position: absolute;
-    right: 1.5rem;
-    top: 1.5rem;
-    font-size: 2rem;
-    font-weight: bold;
+    top: 5px;
+    right: 5px;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 0.8rem;
     cursor: pointer;
-    color: var(--secondary-color);
+    opacity: 0;
+    transition: opacity 0.2s;
 }
-
-.modal-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    margin-top: 1.5rem;
-}
-
-/* Utility Classes */
-.hidden {
-    display: none !important;
+.clickable-zone:hover .edit-icon {
+    opacity: 1;
 }
